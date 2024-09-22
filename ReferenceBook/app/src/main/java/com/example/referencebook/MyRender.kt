@@ -3,17 +3,18 @@ package com.example.opengl
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.opengl.GLU
+import com.example.referencebook.R
 import com.example.referencebook.Square
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class MyRender(context: Context) : GLSurfaceView.Renderer {
-
-    private val square: Square = Square()
+    private val texturedSquare: Square = Square(context)
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
-        gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
-        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY)
+        gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f)
+        gl.glEnable(GL10.GL_TEXTURE_2D)
+        texturedSquare.loadTexture(gl, R.drawable.galaxy)
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
@@ -29,9 +30,8 @@ class MyRender(context: Context) : GLSurfaceView.Renderer {
     override fun onDrawFrame(gl: GL10) {
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT or GL10.GL_DEPTH_BUFFER_BIT)
         gl.glLoadIdentity()
-        gl.glColor4f(1.0f, 0.0f, 0.0f, 0.0f)
         gl.glTranslatef(0.0f, 0.0f, -5.0f)
-        gl.glScalef(1.0f, 1.0f, 1.0f)
-        square.draw(gl)
+        gl.glScalef(2.0f, 2.0f, 1.0f)
+        texturedSquare.draw(gl)
     }
 }
