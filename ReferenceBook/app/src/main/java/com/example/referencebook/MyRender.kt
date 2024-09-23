@@ -1,20 +1,20 @@
-package com.example.opengl
+package com.example.referencebook
 
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.opengl.GLU
-import com.example.referencebook.R
-import com.example.referencebook.Square
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class MyRender(context: Context) : GLSurfaceView.Renderer {
     private val texturedSquare: Square = Square(context)
+    private val cube = Cube()
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
         gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f)
         gl.glEnable(GL10.GL_TEXTURE_2D)
         texturedSquare.loadTexture(gl, R.drawable.galaxy)
+        gl.glEnable(GL10.GL_DEPTH_TEST)
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
@@ -33,5 +33,11 @@ class MyRender(context: Context) : GLSurfaceView.Renderer {
         gl.glTranslatef(0.0f, 0.0f, -5.0f)
         gl.glScalef(2.0f, 2.0f, 1.0f)
         texturedSquare.draw(gl)
+
+        gl.glPushMatrix()
+        gl.glTranslatef(0.0f, 0.0f, 1.0f)
+        gl.glScalef(0.1f, 0.1f, 0.1f)
+        cube.draw(gl)
+        gl.glPopMatrix()
     }
 }
