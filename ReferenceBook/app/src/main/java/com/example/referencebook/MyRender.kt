@@ -9,6 +9,7 @@ import javax.microedition.khronos.opengles.GL10
 class MyRender(context: Context) : GLSurfaceView.Renderer {
     private val texturedSquare: Square = Square(context)
     private val cube = Cube()
+    private var rotationCube: Float = 0f
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
         gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f)
@@ -37,7 +38,11 @@ class MyRender(context: Context) : GLSurfaceView.Renderer {
         gl.glPushMatrix()
         gl.glTranslatef(0.0f, 0.0f, 1.0f)
         gl.glScalef(0.1f, 0.1f, 0.1f)
+        gl.glRotatef(30.0f, 1.0f, 0.0f, 0.0f)
+        gl.glRotatef(rotationCube, 0.0f, 1.0f, 0.0f)
         cube.draw(gl)
         gl.glPopMatrix()
+
+        rotationCube -= 0.5f
     }
 }
