@@ -19,8 +19,8 @@ class Sphere(private val context: Context, private val R: Float) {
     private var n = 0
 
     init {
-        val dtheta = 15
-        val dphi = 15
+        val dtheta = 15 // широта
+        val dphi = 15 // долгота
         val DTOR = Math.PI / 180.0
 
         val byteBuf = ByteBuffer.allocateDirect(5000 * 3 * 4).apply {
@@ -75,6 +75,10 @@ class Sphere(private val context: Context, private val R: Float) {
         return textures[index]
     }
 
+    fun radius() : Float {
+        return R
+    }
+
     fun loadTexture(gl: GL10, resourceId: Int, index: Int) {
         gl.glGenTextures(1, textures, index)
         gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[index])
@@ -89,7 +93,7 @@ class Sphere(private val context: Context, private val R: Float) {
 
     fun draw(gl: GL10) {
         gl.glPushMatrix()
-        gl.glRotatef(90f, 1.0f, 0.0f, 0.0f)
+        gl.glRotatef(-90f, 1.0f, 0.0f, 0.0f)
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY)
         gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY)
 
