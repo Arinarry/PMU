@@ -47,22 +47,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ReferenceBookTheme {
-                var showNews by remember { mutableStateOf(true) }
-                if (showNews) {
-                    NewsScreen(vm = vm) {
-                        showNews = false
-                    }
-                } else {
-                    OpenGLScreen()
+                var currentScreen by remember { mutableStateOf<Screen>(Screen.News) }
+
+                when (currentScreen) {
+                    Screen.News -> NewsScreen(vm = vm) { currentScreen = it }
+                    Screen.OpenGL -> OpenGLScreen(onScreenChange = { currentScreen = it })
+                    Screen.MoonInfo -> MoonView(onScreenChange = { currentScreen = it })
                 }
             }
         }
     }
 }
 
+enum class Screen {
+    News,
+    OpenGL,
+    MoonInfo
+}
 
 @Composable
-fun NewsScreen(vm: MVVM,  onSwitchToOpenGL: () -> Unit) {
+fun NewsScreen(vm: MVVM, onScreenChange: (Screen) -> Unit) {
     val news by vm.currentNews.collectAsState()
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.weight(1f)) {
@@ -74,7 +78,7 @@ fun NewsScreen(vm: MVVM,  onSwitchToOpenGL: () -> Unit) {
             NewsCard(news[3], onLike = { vm.getLikes(3) }, Modifier.weight(1f))
         }
         Button(
-            onClick = onSwitchToOpenGL,
+            onClick = {onScreenChange(Screen.OpenGL)},
             modifier = Modifier.padding(3.dp).fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.White,
@@ -129,7 +133,7 @@ fun NewsCard(news: Data, onLike: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun OpenGLScreen() {
+fun OpenGLScreen(onScreenChange: (Screen) -> Unit) {
     var currentPlanetIndex by remember { mutableStateOf(0) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -158,15 +162,66 @@ fun OpenGLScreen() {
                 modifier = Modifier.width(80.dp)) {
                 Text("<", fontSize = 20.sp)
             }
-            Button(onClick = { },
+            Button(onClick = { if (currentPlanetIndex == 4) {onScreenChange(Screen.MoonInfo)} },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue, contentColor = Color.White),
-                modifier = Modifier.width(145.dp)) {
+                modifier = Modifier.width(150.dp)) {
                 Text("Информация",fontSize = 15.sp)
             }
             Button(onClick = { moveRight(currentPlanetIndex) { newIndex -> currentPlanetIndex = newIndex } },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue, contentColor = Color.White),
                 modifier = Modifier.width(80.dp)) {
                 Text(">", fontSize = 20.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun MoonView(onScreenChange: (Screen) -> Unit) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                GLSurfaceView(context).apply {
+                    setEGLContextClientVersion(2)
+                    setRenderer(MoonRender(context))
+
+                }
+            },
+            update = {
+                it.requestRender()
+            }
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+                .padding(16.dp),
+
+        ) {
+            Text(
+                text = "Информация о Луне",
+                color = Color.White,
+                fontSize = 24.sp
+            )
+            Text(
+                text = "Луна — единственный естественный спутник Земли...",
+                color = Color.White,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(onClick = {onScreenChange(Screen.OpenGL)},
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue, contentColor = Color.White),
+                modifier = Modifier.width(145.dp)) {
+                Text("Назад", fontSize = 15.sp)
             }
         }
     }
