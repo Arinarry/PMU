@@ -2,6 +2,7 @@ package com.example.referencebook
 
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -31,12 +32,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.example.opengl.MyRender
 import com.example.referencebook.ui.theme.ReferenceBookTheme
 
 class MainActivity : ComponentActivity() {
@@ -59,8 +60,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
 @Composable
-fun NewsScreen(vm: MVVM, onSwitchToOpenGL: () -> Unit) {
+fun NewsScreen(vm: MVVM,  onSwitchToOpenGL: () -> Unit) {
     val news by vm.currentNews.collectAsState()
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.weight(1f)) {
@@ -102,7 +104,7 @@ fun NewsCard(news: Data, onLike: () -> Unit, modifier: Modifier = Modifier) {
         }
         Box(
             modifier = modifier.weight(0.3f).fillMaxWidth(),
-            contentAlignment = Alignment.BottomStart
+            contentAlignment = Alignment.Center
         ) {
             Text(text = news.title,
                 fontSize = 15.sp)
@@ -128,12 +130,56 @@ fun NewsCard(news: Data, onLike: () -> Unit, modifier: Modifier = Modifier) {
 
 @Composable
 fun OpenGLScreen() {
-    AndroidView(
-        modifier = Modifier.fillMaxSize(),
-        factory = { context -> GLSurfaceView(context).apply {
-                setEGLContextClientVersion(1)
-                setRenderer(MyRender(context))
+    var currentPlanetIndex by remember { mutableStateOf(0) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                GLSurfaceView(context).apply {
+                    setEGLContextClientVersion(1)
+                    setRenderer(MyRender(context) { currentPlanetIndex })
+                }
+            },
+            update = {
+                it.requestRender()
+            }
+        )
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = { moveLeft(currentPlanetIndex) { newIndex -> currentPlanetIndex = newIndex } },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue, contentColor = Color.White),
+                modifier = Modifier.width(80.dp)) {
+                Text("<", fontSize = 20.sp)
+            }
+            Button(onClick = { },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue, contentColor = Color.White),
+                modifier = Modifier.width(145.dp)) {
+                Text("Информация",fontSize = 15.sp)
+            }
+            Button(onClick = { moveRight(currentPlanetIndex) { newIndex -> currentPlanetIndex = newIndex } },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue, contentColor = Color.White),
+                modifier = Modifier.width(80.dp)) {
+                Text(">", fontSize = 20.sp)
             }
         }
-    )
+    }
 }
+
+fun moveRight(currentIndex: Int, updateIndex: (Int) -> Unit) {
+    val planetsCount = 11
+    updateIndex((currentIndex + 1) % planetsCount)
+}
+
+fun moveLeft(currentIndex: Int, updateIndex: (Int) -> Unit) {
+    val planetsCount = 11
+    updateIndex(if (currentIndex - 1 < 0) planetsCount - 1 else currentIndex - 1)
+}
+
+

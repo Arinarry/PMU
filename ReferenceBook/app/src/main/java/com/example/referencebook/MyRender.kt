@@ -10,7 +10,7 @@ import javax.microedition.khronos.opengles.GL10
 import kotlin.math.cos
 import kotlin.math.sin
 
-class MyRender(context: Context) : GLSurfaceView.Renderer {
+class MyRender(context: Context, private val currentPlanetIndexProvider: () -> Int) : GLSurfaceView.Renderer {
     private val texturedSquare: Square = Square(context)
     private val sun = Sphere(context, 0.2f)
     private val mercury = Sphere(context, 0.05f)
@@ -81,6 +81,7 @@ class MyRender(context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gl: GL10) {
+        currentPlanetIndex = currentPlanetIndexProvider()
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT or GL10.GL_DEPTH_BUFFER_BIT)
         gl.glLoadIdentity()
 
