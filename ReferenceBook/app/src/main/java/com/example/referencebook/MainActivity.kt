@@ -1,5 +1,6 @@
 package com.example.referencebook
 
+import android.graphics.PixelFormat
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.view.WindowManager
@@ -42,7 +43,7 @@ import com.example.referencebook.ui.theme.ReferenceBookTheme
 
 class MainActivity : ComponentActivity() {
     private val vm: MVVM by viewModels()
-
+    private val planetvm: MVVMPlanet by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -53,6 +54,46 @@ class MainActivity : ComponentActivity() {
                     Screen.News -> NewsScreen(vm = vm) { currentScreen = it }
                     Screen.OpenGL -> OpenGLScreen(onScreenChange = { currentScreen = it })
                     Screen.MoonInfo -> MoonView(onScreenChange = { currentScreen = it })
+                    Screen.PlanetInfo -> {
+                        val planet = planetvm.planets[0]
+                        PlanetView (planet = planet , onScreenChange = { currentScreen = it })
+                    }
+                    Screen.PlanetInfo1 -> {
+                        val planet = planetvm.planets[1]
+                        PlanetView (planet = planet , onScreenChange = { currentScreen = it })
+                    }
+                    Screen.PlanetInfo2 -> {
+                        val planet = planetvm.planets[2]
+                        PlanetView (planet = planet , onScreenChange = { currentScreen = it })
+                    }
+                    Screen.PlanetInfo3 -> {
+                        val planet = planetvm.planets[3]
+                        PlanetView (planet = planet , onScreenChange = { currentScreen = it })
+                    }
+                    Screen.PlanetInfo4 -> {
+                        val planet = planetvm.planets[4]
+                        PlanetView (planet = planet , onScreenChange = { currentScreen = it })
+                    }
+                    Screen.PlanetInfo5 -> {
+                        val planet = planetvm.planets[5]
+                        PlanetView (planet = planet , onScreenChange = { currentScreen = it })
+                    }
+                    Screen.PlanetInfo6 -> {
+                        val planet = planetvm.planets[6]
+                        PlanetView (planet = planet , onScreenChange = { currentScreen = it })
+                    }
+                    Screen.PlanetInfo7 -> {
+                        val planet = planetvm.planets[7]
+                        PlanetView (planet = planet , onScreenChange = { currentScreen = it })
+                    }
+                    Screen.PlanetInfo8 -> {
+                        val planet = planetvm.planets[8]
+                        PlanetView (planet = planet , onScreenChange = { currentScreen = it })
+                    }
+                    Screen.PlanetInfo9 -> {
+                        val planet = planetvm.planets[9]
+                        PlanetView (planet = planet , onScreenChange = { currentScreen = it })
+                    }
                 }
             }
         }
@@ -62,7 +103,17 @@ class MainActivity : ComponentActivity() {
 enum class Screen {
     News,
     OpenGL,
-    MoonInfo
+    MoonInfo,
+    PlanetInfo,
+    PlanetInfo1,
+    PlanetInfo2,
+    PlanetInfo3,
+    PlanetInfo4,
+    PlanetInfo5,
+    PlanetInfo6,
+    PlanetInfo7,
+    PlanetInfo8,
+    PlanetInfo9
 }
 
 @Composable
@@ -162,7 +213,20 @@ fun OpenGLScreen(onScreenChange: (Screen) -> Unit) {
                 modifier = Modifier.width(80.dp)) {
                 Text("<", fontSize = 20.sp)
             }
-            Button(onClick = { if (currentPlanetIndex == 4) {onScreenChange(Screen.MoonInfo)} },
+            Button(onClick = { when (currentPlanetIndex){
+                0 -> {onScreenChange(Screen.PlanetInfo)}
+                1 -> {onScreenChange(Screen.PlanetInfo1)}
+                2 -> {onScreenChange(Screen.PlanetInfo2)}
+                3 -> {onScreenChange(Screen.PlanetInfo3)}
+                4 -> {onScreenChange(Screen.MoonInfo)}
+                5 -> {onScreenChange(Screen.PlanetInfo4)}
+                6 -> {onScreenChange(Screen.PlanetInfo5)}
+                7 -> {onScreenChange(Screen.PlanetInfo6)}
+                8 -> {onScreenChange(Screen.PlanetInfo7)}
+                9 -> {onScreenChange(Screen.PlanetInfo8)}
+                10 -> {onScreenChange(Screen.PlanetInfo9)}
+                else -> {}
+            } },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue, contentColor = Color.White),
                 modifier = Modifier.width(150.dp)) {
                 Text("Информация",fontSize = 15.sp)
@@ -185,17 +249,14 @@ fun MoonView(onScreenChange: (Screen) -> Unit) {
                 GLSurfaceView(context).apply {
                     setEGLContextClientVersion(2)
                     setRenderer(MoonRender(context))
-
+                    setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY)
                 }
-            },
-            update = {
-                it.requestRender()
             }
         )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
+                .background(Color(0x80000000))
                 .padding(16.dp),
 
         ) {
@@ -205,7 +266,7 @@ fun MoonView(onScreenChange: (Screen) -> Unit) {
                 fontSize = 24.sp
             )
             Text(
-                text = "Луна — единственный естественный спутник Земли...",
+                text = "Луна — единственный естественный спутник Земли. Она является единственным внеземным астрономическим объектом, на который ступала нога человека.",
                 color = Color.White,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 8.dp)
@@ -214,6 +275,45 @@ fun MoonView(onScreenChange: (Screen) -> Unit) {
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(onClick = {onScreenChange(Screen.OpenGL)},
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue, contentColor = Color.White),
+                modifier = Modifier.width(145.dp)) {
+                Text("Назад", fontSize = 15.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun PlanetView(planet: DataPlanet, onScreenChange: (Screen) -> Unit) {
+    Column(
+        modifier =Modifier.fillMaxSize().background(Color.Black),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Box(
+            modifier = Modifier.weight(0.6f).fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = planet.imageUrl),
+                contentDescription = planet.name,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        Box(
+            modifier = Modifier.weight(0.3f).fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = planet.description,
+                color = Color.White,
+                fontSize = 18.sp)
+        }
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
                 .fillMaxWidth()
                 .padding(16.dp),
             horizontalArrangement = Arrangement.Center
