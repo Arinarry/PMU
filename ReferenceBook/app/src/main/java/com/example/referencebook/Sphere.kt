@@ -15,7 +15,7 @@ import kotlin.math.sin
 class Sphere(private val context: Context, private val R: Float) {
     private val mVertexBuffer: FloatBuffer
     private val textureBuffer: FloatBuffer
-    private val textures = IntArray(11)
+    private val textures = IntArray(12)
     private var n = 0
 
     init {

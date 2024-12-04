@@ -23,6 +23,7 @@ class MyRender(context: Context, private val currentPlanetIndexProvider: () -> I
     private val uranus = Sphere(context, 0.1f)
     private val neptune = Sphere(context, 0.1f)
     private val pluto = Sphere(context, 0.05f)
+    private val blackHole = Sphere(context, 0.1f)
     private val cube = Cube()
 
     private var sunRotationAngle = 0f
@@ -39,6 +40,13 @@ class MyRender(context: Context, private val currentPlanetIndexProvider: () -> I
 
     private var width = 0
     private var height = 0
+
+    private var blackHoleX = 1.5f
+    private var blackHoleY = 1.5f
+    private val blackHoleSpeedX = -0.03f
+    private val blackHoleSpeedY = -0.03f
+    private var blackHoleVisible = true
+    private var lastResetTime = System.currentTimeMillis()
 
     private var currentPlanetIndex = 0
     private var planets = listOf(sun, mercury, venus, earth, moon, mars, jupiter, saturn, uranus, neptune, pluto)
@@ -65,6 +73,7 @@ class MyRender(context: Context, private val currentPlanetIndexProvider: () -> I
         uranus.loadTexture(gl, R.drawable.uranus_texture, 8)
         neptune.loadTexture(gl, R.drawable.neptune_texture, 9)
         pluto.loadTexture(gl, R.drawable.pluto_texture, 10)
+        blackHole.loadTexture(gl, R.drawable.blackhole, 11)
     }
 
     override fun onSurfaceChanged(gl: GL10, w: Int, h: Int) {
@@ -93,6 +102,29 @@ class MyRender(context: Context, private val currentPlanetIndexProvider: () -> I
         texturedSquare.draw(gl)
         gl.glPopMatrix()
 
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastResetTime >= 11000) {
+            blackHoleX = 1.5f
+            blackHoleY = 1.5f
+            blackHoleVisible = true
+            lastResetTime = currentTime
+        }
+
+        if (blackHoleVisible) {
+            blackHoleX += blackHoleSpeedX
+            blackHoleY += blackHoleSpeedY
+
+            if (blackHoleX <= -1.5f || blackHoleY <= -1.5f) {
+                blackHoleVisible = false
+            }
+
+            gl.glPushMatrix()
+            gl.glTranslatef(blackHoleX, blackHoleY, -4.7f)
+            gl.glBindTexture(GL10.GL_TEXTURE_2D, blackHole.getTextureId(11))
+            blackHole.draw(gl)
+            gl.glPopMatrix()
+        }
+
         gl.glPushMatrix()
         gl.glTranslatef(0.0f, 0.0f, -5.0f)
         gl.glRotatef(sunRotationAngle, 0.0f, 1.0f, 0.0f)
@@ -119,6 +151,7 @@ class MyRender(context: Context, private val currentPlanetIndexProvider: () -> I
         drawPlanet(gl, uranus, uranusAngle, 2.0f, 0.5f, 8, 8) // Уран
         drawPlanet(gl, neptune, neptuneAngle, 2.2f, 0.3f, 9, 9) // Нептун
         drawPlanet(gl, pluto, plutoAngle, 2.5f, 0.2f, 10, 10) // Плутон
+
 
         sunRotationAngle -= 1f
         mercuryAngle += 4f
